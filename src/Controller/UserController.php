@@ -27,17 +27,29 @@ class UserController extends AbstractController
 
     #[IsGranted("ROLE_ADMIN")]
     #[Route('/api/users/{id}', name: 'app_user_delete', methods: ['DELETE'])]
-    public function delete(User $user, EntityManagerInterface $em): JsonResponse 
+    public function delete(User $user, EntityManagerInterface $em, UserRepository $userRepository, JWTTokenManagerInterface $jwtManager, TokenStorageInterface $tokenStorage): JsonResponse 
     {
-        $em->remove($user);
-        $em->flush();
+        $token = $jwtManager->decode($tokenStorage->getToken());
+        $authenticatedUser = $userRepository->getByUsername($token["username"]);
+        $client = $authenticatedUser->getClient();
 
+        if ($user->getClient()->getId() === $client->getId()){
+
+            $em->remove($user);
+            $em->flush();
+
+        } else {
+
+            throw new HttpException(JsonResponse::HTTP_BAD_REQUEST, "Utilisateur invalide");
+
+        }
+        
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
     #[IsGranted("ROLE_ADMIN", message: 'Seul les administrateur peuvent exécuter cette requête')]
     #[Route('/api/users', name:"app_create_user", methods: ['POST'])]
-    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ClientRepository $clientRepository, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface, ValidatorInterface $validator): JsonResponse 
+    public function create(Request $request, SerializerInterface $serializer, UserRepository $userRepository, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface, ValidatorInterface $validator, JWTTokenManagerInterface $jwtManager, TokenStorageInterface $tokenStorage): JsonResponse 
     {
 
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
@@ -46,19 +58,22 @@ class UserController extends AbstractController
 
         if ($errors->count() > 0){
 
-            throw new HttpException(JsonResponse::HTTP_BAD_REQUEST, "requête ivalide");
+            throw new HttpException(JsonResponse::HTTP_BAD_REQUEST, "Requête invalide");
 
         }
 
-        $token = $jwtManager->decode($tokenStorage->getToken());
-        $user = $userRepository->getByUsername($token["username"]);
-        $clientId = $user->getClient()->getId();
+        
         
         $content = $request->toArray();
+
+        $token = $jwtManager->decode($tokenStorage->getToken());
+        $authenticatedUser = $userRepository->getByUsername($token["username"]);
+        $client = $authenticatedUser->getClient();
+        $user->setClient($client);
+
         $hashedPassword = $hasherInetrface->hashPassword($user, $user->getPassword());
-        
-        $user->setClient($clientRepository->findOneById($idClient));
         $user->setPassword($hashedPassword);
+
         $em->persist($user);
         $em->flush();
 
@@ -75,10 +90,10 @@ class UserController extends AbstractController
     {
 
         $token = $jwtManager->decode($tokenStorage->getToken());
-        $user = $userRepository->getByUsername($token["username"]);
-        $clientId = $user->getClient();
+        $authenticatedUser = $userRepository->getByUsername($token["username"]);
+        $client = $authenticatedUser->getClient();
 
-        $users = $userRepository->findAllOfThisClient($clientId);
+        $users = $userRepository->findAllOfThisClient($client);
         $jsonUsers = $serializer->serialize($users, 'json', ['groups' => 'user']);
         
         return new JsonResponse($jsonUsers, Response::HTTP_OK, [], true);
@@ -89,10 +104,10 @@ class UserController extends AbstractController
     public function getOne(UserRepository $userRepository, SerializerInterface $serializer, $id_user): JsonResponse
     {
         $token = $jwtManager->decode($tokenStorage->getToken());
-        $user = $userRepository->getByUsername($token["username"]);
-        $clientId = $user->getClient();
+        $authenticatedUser = $userRepository->getByUsername($token["username"]);
+        $client = $authenticatedUser->getClient();
         
-        $users = $userRepository->findOneById($id_user, $clientId = 5);
+        $users = $userRepository->findOneById($id_user, $client);
         if ($users) {
 
             $jsonusers = $serializer->serialize($users, 'json', ['groups' => 'user']);

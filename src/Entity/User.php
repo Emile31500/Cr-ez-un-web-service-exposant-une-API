@@ -43,13 +43,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Groups(['user'])]
-    #[Assert\Length(min: 10, max: 10, minMessage: "Un numéro de téléphone valide doit contenir {{ limit }} caractères", maxMessage: "Un numéro de téléphone valide doit contenir {{ limit }} caractères")] 
     private ?string $phoneNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['user'])]
-    #[Assert\NotBlank(message: "Le client est obligatoire")]
     private ?Client $client = null;
 
     public function getId(): ?int
