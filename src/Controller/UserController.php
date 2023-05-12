@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -18,6 +19,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends AbstractController
 {
@@ -47,8 +50,11 @@ class UserController extends AbstractController
 
         }
 
+        $token = $jwtManager->decode($tokenStorage->getToken());
+        $user = $userRepository->getByUsername($token["username"]);
+        $clientId = $user->getClient()->getId();
+        
         $content = $request->toArray();
-        $idClient = $content['idClient'];
         $hashedPassword = $hasherInetrface->hashPassword($user, $user->getPassword());
         
         $user->setClient($clientRepository->findOneById($idClient));
@@ -60,16 +66,21 @@ class UserController extends AbstractController
         $location = $urlGenerator->generate('app_user_details', ['id_user' => $user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, ["Location" => $location], true);
-   }
+    }
 
 
     #[Groups(['user'])]
     #[Route('/api/users', name: 'app_user_list', methods: ['GET'])]
-    public function getAll(UserRepository $userRepository, SerializerInterface $serializer): JsonResponse
+    public function getAll(UserRepository $userRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, JWTTokenManagerInterface $jwtManager, TokenStorageInterface $tokenStorage): JsonResponse
     {
-        $users = $userRepository->findAll();
-        $jsonUsers = $serializer->serialize($users, 'json', ['groups' => 'user']);
 
+        $token = $jwtManager->decode($tokenStorage->getToken());
+        $user = $userRepository->getByUsername($token["username"]);
+        $clientId = $user->getClient();
+
+        $users = $userRepository->findAllOfThisClient($clientId);
+        $jsonUsers = $serializer->serialize($users, 'json', ['groups' => 'user']);
+        
         return new JsonResponse($jsonUsers, Response::HTTP_OK, [], true);
     }
 
@@ -77,7 +88,11 @@ class UserController extends AbstractController
     #[Route('/api/users/{id_user}', name: 'app_user_details', methods: ['GET'])]    
     public function getOne(UserRepository $userRepository, SerializerInterface $serializer, $id_user): JsonResponse
     {
-        $users = $userRepository->findOneById($id_user);
+        $token = $jwtManager->decode($tokenStorage->getToken());
+        $user = $userRepository->getByUsername($token["username"]);
+        $clientId = $user->getClient();
+        
+        $users = $userRepository->findOneById($id_user, $clientId = 5);
         if ($users) {
 
             $jsonusers = $serializer->serialize($users, 'json', ['groups' => 'user']);
@@ -90,4 +105,5 @@ class UserController extends AbstractController
         }
         
     }
+
 }
