@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -19,6 +20,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(['user'])]
+    #[Length(min: 1, max: 180, minMessage: "Le nom d'utilisateur doit contenir {{ limit }} caractères minimum", maxMessage: "Le nom d'utilisateur ne doit pas contenir plus de {{ limit }}")] 
+    #[NotBlank(message: "L'email est obligatoire")]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -29,19 +32,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire")]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user'])]
+    #[Assert\NotBlank(message: "Le nom d'utilisateur est obligatoire")]
+    #[Assert\Length(min: 1, max: 255, minMessage: "Le nom d'utilisateur doit contenir {{ limit }} caractères minimum", maxMessage: "Le nom d'utilisateur ne doit pas contenir plus de {{ limit }}")] 
     private ?string $username = null;
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Groups(['user'])]
+    #[Assert\Length(min: 10, max: 10, minMessage: "Un numéro de téléphone valide doit contenir {{ limit }} caractères", maxMessage: "Un numéro de téléphone valide doit contenir {{ limit }} caractères")] 
     private ?string $phoneNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['user'])]
+    #[Assert\NotBlank(message: "Le client est obligatoire")]
     private ?Client $client = null;
 
     public function getId(): ?int

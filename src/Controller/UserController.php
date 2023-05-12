@@ -12,6 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,12 +32,21 @@ class UserController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[IsGranted("ROLE_ADMIN")]
+    #[IsGranted("ROLE_ADMIN", message: 'Seul les administrateur peuvent exécuter cette requête')]
     #[Route('/api/users', name:"app_create_user", methods: ['POST'])]
-    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ClientRepository $clientRepository, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface): JsonResponse 
+    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ClientRepository $clientRepository, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface, ValidatorInterface $validator): JsonResponse 
     {
 
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+        
+        $errors = $validator->validate($user);
+
+        if ($errors->count() > 0){
+
+            throw new HttpException(JsonResponse::HTTP_BAD_REQUEST, "requête ivalide");
+
+        }
+
         $content = $request->toArray();
         $idClient = $content['idClient'];
         $hashedPassword = $hasherInetrface->hashPassword($user, $user->getPassword());
