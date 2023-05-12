@@ -35,8 +35,10 @@ class UserController extends AbstractController
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
         $content = $request->toArray();
         $idClient = $content['idClient'];
+        $hashedPassword = $hasherInetrface->hashPassword($user, $user->getPassword());
+        
         $user->setClient($clientRepository->findOneById($idClient));
-
+        $user->setPassword($hashedPassword);
         $em->persist($user);
         $em->flush();
 
