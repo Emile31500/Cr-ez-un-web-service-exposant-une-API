@@ -14,7 +14,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
 
         $exception = $event->getThrowable();
-        // ...
+        
         if ($exception instanceof HttpException){
             
             $data = [
