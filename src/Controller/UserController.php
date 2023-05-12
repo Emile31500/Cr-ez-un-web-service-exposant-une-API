@@ -13,12 +13,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserController extends AbstractController
 {
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/api/users/{id}', name: 'app_user_delete', methods: ['DELETE'])]
     public function delete(User $user, EntityManagerInterface $em): JsonResponse 
     {
@@ -28,6 +30,7 @@ class UserController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
+    #[IsGranted("ROLE_ADMIN")]
     #[Route('/api/users', name:"app_create_user", methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, ClientRepository $clientRepository, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface): JsonResponse 
     {
