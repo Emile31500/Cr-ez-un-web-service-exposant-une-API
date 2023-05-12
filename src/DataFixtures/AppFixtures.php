@@ -39,28 +39,28 @@ class AppFixtures extends Fixture
         $ldlc_user->setEmail("user.1@gldlc.com");
         $ldlc_user->setPassword($this->userPasswordHasher->hashPassword($ldlc_user, "AGO123ER78"));
         $ldlc_user->setClient($ldlc);
-        $ldlc_user->setRoles(['ROLES_USER']);
+        $ldlc_user->setRoles(['ROLE_USER']);
         $ldlc_user->setPhoneNumber('0674759132');
 
         $ldlc_admin->setName("Admin_1");
         $ldlc_admin->setEmail("admin.1@ldlc.com");
         $ldlc_admin->setPassword($this->userPasswordHasher->hashPassword($ldlc_admin, "AGO123ER78"));
         $ldlc_admin->setClient($ldlc);
-        $ldlc_admin->setRoles(['ROLES_ADMIN']);
+        $ldlc_admin->setRoles(['ROLE_ADMIN']);
         $ldlc_admin->setPhoneNumber('0632354198');
 
         $mat_net_user->setName("User_1");
         $mat_net_user->setEmail("user.1@material.net");
         $mat_net_user->setPassword($this->userPasswordHasher->hashPassword($mat_net_user, "AGO123ER78"));
         $mat_net_user->setClient($materiel_net);
-        $mat_net_user->setRoles(['ROLES_USER']);
+        $mat_net_user->setRoles(['ROLE_USER']);
         $mat_net_user->setPhoneNumber('0614129691');
 
         $mat_net_admin->setName("Admin_1");
         $mat_net_admin->setEmail("admin.1@material.net");
         $mat_net_admin->setPassword($this->userPasswordHasher->hashPassword($mat_net_admin, "AGO123ER78"));
         $mat_net_admin->setClient($materiel_net);
-        $mat_net_admin->setRoles(['ROLES_ADMIN']);
+        $mat_net_admin->setRoles(['ROLE_ADMIN']);
         $mat_net_admin->setPhoneNumber('0614153278');
 
         $phone_apple = new Phone();
