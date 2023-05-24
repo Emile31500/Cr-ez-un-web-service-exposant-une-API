@@ -3,18 +3,22 @@
 namespace App\Repository;
 
 use App\Entity\Client;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
- * @extends ServiceEntityRepository<Client>
+ * @extends ServiceEntityRepository<User>
  *
  * @method Client|null find($id, $lockMode = null, $lockVersion = null)
  * @method Client|null findOneBy(array $criteria, array $orderBy = null)
  * @method Client[]    findAll()
  * @method Client[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ClientRepository extends ServiceEntityRepository
+class ClientRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -40,24 +44,54 @@ class ClientRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Client[] Returns an array of Client objects
+     * Used to upgrade (rehash) the Client's password automatically over time.
      */
-    public function findAll(): array
+    public function upgradePassword(PasswordAuthenticatedUserInterface $client, string $newHashedPassword): void
+    {
+        if (!$client instanceof Client) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
+        }
+
+        $client->setPassword($newHashedPassword);
+
+        $this->save($client, true);
+    }
+
+    /**
+     * @return Client[] Returns an array of User objects
+     */
+    public function findAllInThisProject(Project $project): array
     {
         return $this->createQueryBuilder('c')
+            ->andWhere('c.project = :project')
+            ->setParameter('project', $project)
             ->orderBy('c.id', 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    public function findOneById($value): ?Client
+    public function findOneById($id, $project): ?Client
     {
         return $this->createQueryBuilder('c')
             ->andWhere('c.id = :val')
-            ->setParameter('val', $value)
+            ->andWhere('c.project = :project')
+            ->setParameter('project', $project)
+            ->setParameter('val', $id)
             ->getQuery()
             ->getOneOrNullResult()
         ;
+    }
+
+    public function getByUserName(string $username): ?Client
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.email = :val')
+            ->setParameter('val', $username)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        
     }
 }
