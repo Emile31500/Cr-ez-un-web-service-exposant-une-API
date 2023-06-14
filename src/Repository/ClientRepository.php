@@ -4,11 +4,12 @@ namespace App\Repository;
 
 use App\Entity\Client;
 use App\Entity\Project;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -62,13 +63,15 @@ class ClientRepository extends ServiceEntityRepository implements PasswordUpgrad
      */
     public function findAllInThisProject(Project $project): array
     {
-        return $this->createQueryBuilder('c')
+        $queryClient = $this->createQueryBuilder('c')
             ->andWhere('c.project = :project')
             ->setParameter('project', $project)
-            ->orderBy('c.id', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+            ->orderBy('c.id', 'ASC');
+
+        $query = $queryClient->getQuery();
+        $query->setFetchMode(Client::class, "project", ClassMetadata::FETCH_EAGER);
+        return $query->getResult();
+    
     }
 
     public function findOneById($id, $project): ?Client

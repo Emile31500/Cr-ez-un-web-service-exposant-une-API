@@ -9,6 +9,7 @@ use JMS\Serializer\Annotation\Since;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Symfony\Contracts\Cache\ItemInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -135,16 +136,23 @@ class ClientController extends AbstractController
     #[Since("1.0")]
     public function getAll(ClientRepository $ClientRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
     {
-        $project = $this->getUser()->getProject();
-
-        $Clients = $ClientRepository->findAllInThisProject($project);
-        $jsonClients = $serializer->serialize($Clients, 'json', ['groups' => 'project']);
         
+        $project = $this->getUser()->getProject();
+        
+        $idCache = "getAllClient";
+        $jsonClients = $cache->get($idCache, function (ItemInterface $item) use ($ClientRepository, $serializer, $project){
+            
+            $item->tag("clientsCache");
+            $clients = $ClientRepository->findAllInThisProject($project);
+            return $serializer->serialize($clients, 'json', ['groups' => 'project']);
+
+        }); 
+
         return new JsonResponse($jsonClients, Response::HTTP_OK, [], true);
     }
 
     /**
-     * This method use to list a clients according to id if it belongs to project of authenticated user
+     * This method use to list a clients according to id if belongs to user authenticated project 
      * 
      * @OA\Response(
      *     response=200,
@@ -161,23 +169,28 @@ class ClientController extends AbstractController
     #[Groups(['Client'])]
     #[Route('/api/clients/{id_Client}', name: 'app_Client_details', methods: ['GET'])]
     #[Since("1.0")]
-    public function getOne(ClientRepository $ClientRepository, SerializerInterface $serializer, $id_Client): JsonResponse
+    public function getOne(ClientRepository $ClientRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $id_Client): JsonResponse
     {
 
-        $User = $this->getUser();
-        
-        $client = $ClientRepository->findOneById($id_Client, $User);
-        if ($client) {
+        $project = $this->getUser()->getProject();
+        $idCache = "getOneClient";
 
-            $jsonClients = $serializer->serialize($client, 'json', ['groups' => 'Client']);
-            return new JsonResponse($jsonClients, Response::HTTP_OK, [], true);
+        $jsonClient = $cache->get($idCache, function (ItemInterface $item) use ($ClientRepository, $id_Client, $serializer, $project){
+            
+            $item->tag("clientCache");
+            $client = $ClientRepository->findOneById($id_Client, $project);
 
-        } else {
+            if ($client) {
 
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+                return $serializer->serialize($client, 'json', ['groups' => 'project']);
+            
+            } else {
 
-        }
-        
+                return new JsonResponse(null, Response::HTTP_NOT_FOUND);
+
+            }
+        }); 
+
+        return new JsonResponse($jsonClient, Response::HTTP_OK, [], true);
     }
-
 }

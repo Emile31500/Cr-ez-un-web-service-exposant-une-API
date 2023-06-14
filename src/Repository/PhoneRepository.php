@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Phone;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Phone>
@@ -42,22 +43,19 @@ class PhoneRepository extends ServiceEntityRepository
     /**
      * @return Phone[] Returns an array of Phone objects
      */
-    public function findByExampleField(): array
+    public function findAll(): array
     {
         return $this->createQueryBuilder('p')
-            ->orderBy('p.id', 'ASC')
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
-    public function findOneBySomeField($id): ?Phone
+    public function findOneById(int $id): ?Phone
     {
         return $this->createQueryBuilder('p')
             ->andWhere('p.id = :val')
             ->setParameter('val', $id)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
 }

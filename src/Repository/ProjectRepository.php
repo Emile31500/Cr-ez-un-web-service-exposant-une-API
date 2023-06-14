@@ -45,7 +45,7 @@ class ProjectRepository extends ServiceEntityRepository
     public function findAll(): array
     {
         return $this->createQueryBuilder('c')
-            ->orderBy('p.id', 'ASC')
+            ->orderBy('c.id', 'ASC')
             ->getQuery()
             ->getResult()
         ;
