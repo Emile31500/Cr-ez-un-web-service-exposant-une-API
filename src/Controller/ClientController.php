@@ -88,7 +88,7 @@ class ClientController extends AbstractController
     #[IsGranted("ROLE_ADMIN", message: 'Seul les administrateur peuvent exécuter cette requête')]
     #[Route('/api/clients', name:"app_create_Client", methods: ['POST'])]
     #[Since("1.0")]
-    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface, ValidatorInterface $validator): JsonResponse 
+    public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $em, UrlGeneratorInterface $urlGenerator, UserPasswordHasherInterface $hasherInetrface, ValidatorInterface $validator, TagAwareCacheInterface $cache): JsonResponse 
     {
 
         $client = $serializer->deserialize($request->getContent(), Client::class, 'json');
@@ -109,6 +109,8 @@ class ClientController extends AbstractController
 
         $em->persist($client);
         $em->flush();
+
+        $cache->deleteItem("getAllClient");
 
         $jsonClient = $serializer->serialize($client, 'json', ['groups' => 'Client']);
         $location = $urlGenerator->generate('app_Client_details', ['id_Client' => $client->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
