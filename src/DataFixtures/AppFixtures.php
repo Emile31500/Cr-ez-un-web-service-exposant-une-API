@@ -26,90 +26,118 @@ class AppFixtures extends Fixture
         $ldlc->setName("LDLC");
         $ldlc->setSIREN(13597328412679);
 
-        $materiel_net = new Project();
-        $materiel_net->setName("Materiel.net");
-        $materiel_net->setSIREN(76143189345671);
+        $materielNet = new Project();
+        $materielNet->setName("Materiel.net");
+        $materielNet->setSIREN(76143189345671);
 
-        $ldlc_user = new Client();
-        $ldlc_admin = new Client();
-        $mat_net_user = new Client();
-        $mat_net_admin = new Client();
+        $ldlcUser = new Client();
+        $ldlcAdmin = new Client();
+        $matNetUser = new Client();
+        $matNetAdmin = new Client();
 
-        $ldlc_user->setClientName("User_1");
-        $ldlc_user->setEmail("user.1@gldlc.com");
-        $ldlc_user->setPassword($this->userPasswordHasher->hashPassword($ldlc_user, "AGO123ER78"));
-        $ldlc_user->setProject($ldlc);
-        $ldlc_user->setRoles(['ROLE_USER']);
-        $ldlc_user->setPhoneNumber('0674759132');
+        $ldlcUser->setClientName("User_1");
+        $ldlcUser->setEmail("user.1@gldlc.com");
+        $ldlcUser->setPassword($this->userPasswordHasher->hashPassword($ldlcUser, "AGO123ER78"));
+        $ldlcUser->setProject($ldlc);
+        $ldlcUser->setRoles(['ROLE_USER']);
+        $ldlcUser->setPhoneNumber('0674759132');
 
-        $ldlc_admin->setClientName("Admin_1");
-        $ldlc_admin->setEmail("admin.1@ldlc.com");
-        $ldlc_admin->setPassword($this->userPasswordHasher->hashPassword($ldlc_admin, "AGO123ER78"));
-        $ldlc_admin->setProject($ldlc);
-        $ldlc_admin->setRoles(['ROLE_ADMIN']);
-        $ldlc_admin->setPhoneNumber('0632354198');
+        $ldlcAdmin->setClientName("Admin_1");
+        $ldlcAdmin->setEmail("admin.1@ldlc.com");
+        $ldlcAdmin->setPassword($this->userPasswordHasher->hashPassword($ldlcAdmin, "AGO123ER78"));
+        $ldlcAdmin->setProject($ldlc);
+        $ldlcAdmin->setRoles(['ROLE_ADMIN']);
+        $ldlcAdmin->setPhoneNumber('0632354198');
 
-        $mat_net_user->setClientName("User_1");
-        $mat_net_user->setEmail("user.1@material.net");
-        $mat_net_user->setPassword($this->userPasswordHasher->hashPassword($mat_net_user, "AGO123ER78"));
-        $mat_net_user->setProject($materiel_net);
-        $mat_net_user->setRoles(['ROLE_USER']);
-        $mat_net_user->setPhoneNumber('0614129691');
+        $matNetUser->setClientName("User_1");
+        $matNetUser->setEmail("user.1@material.net");
+        $matNetUser->setPassword($this->userPasswordHasher->hashPassword($matNetUser, "AGO123ER78"));
+        $matNetUser->setProject($materielNet);
+        $matNetUser->setRoles(['ROLE_USER']);
+        $matNetUser->setPhoneNumber('0614129691');
 
-        $mat_net_admin->setClientName("Admin_1");
-        $mat_net_admin->setEmail("admin.1@material.net");
-        $mat_net_admin->setPassword($this->userPasswordHasher->hashPassword($mat_net_admin, "AGO123ER78"));
-        $mat_net_admin->setProject($materiel_net);
-        $mat_net_admin->setRoles(['ROLE_ADMIN']);
-        $mat_net_admin->setPhoneNumber('0614153278');
+        $matNetAdmin->setClientName("Admin_1");
+        $matNetAdmin->setEmail("admin.1@material.net");
+        $matNetAdmin->setPassword($this->userPasswordHasher->hashPassword($matNetAdmin, "AGO123ER78"));
+        $matNetAdmin->setProject($materielNet);
+        $matNetAdmin->setRoles(['ROLE_ADMIN']);
+        $matNetAdmin->setPhoneNumber('0614153278');
 
-        $phone_apple = new Phone();
-        $phone_apple->setBrand("Apple");
-        $phone_apple->setName("iPhone 12");
-        $phone_apple->setCpu(["frequency" => 3.1, "hearts" => 6, "name" => "A 14 Bionic"]);
-        $phone_apple->setGpu(["frequency" => 1.0]);
-        $phone_apple->setRam(["capacity" => 4, "type" => "LPDDR4x", "frequency" => 2133]);
-        $phone_apple->setScreen(["frequency" => 60, "definition" => "2532 x 1170", "type" => "XDR"]);
-        $phone_apple->setDescription("No desc yet.");
-        $phone_apple->setPrice(600.0);
-        $phone_apple->setImageUrl("unknowjpg");
-        $phone_apple->setCount(200);
+        $iPhoneDz = new Phone();
+        $iPhoneDz->setBrand("Apple");
+        $iPhoneDz->setName("iPhone 12");
+        $iPhoneDz->setCpu(["frequency" => 3.1, "hearts" => 6, "name" => "A 14 Bionic"]);
+        $iPhoneDz->setGpu(["frequency" => 1.0]);
+        $iPhoneDz->setRam(["capacity" => 4, "type" => "LPDDR4x", "frequency" => 2133]);
+        $iPhoneDz->setScreen(["frequency" => 60, "definition" => "2532 x 1170", "type" => "XDR"]);
+        $iPhoneDz->setDescription("No desc yet.");
+        $iPhoneDz->setPrice(600.0);
+        $iPhoneDz->setImageUrl("unknowjpg");
+        $iPhoneDz->setCount(200);
 
-        $phone_sam = new Phone();
-        $phone_sam->setBrand("Samsug");
-        $phone_sam->setName("Galaxy Z Flip 4");
-        $phone_sam->setCpu(["frequency" => 3.0, "hearts" => 8, "name" => "Snapdragon 8+ gen 1"]);
-        $phone_sam->setGpu(["frequency" => 0.818]);
-        $phone_sam->setRam(["capacity" => 8, "type" => "LPDDR4x", "frequency" => 2133]);
-        $phone_sam->setScreen(["frequency" => 120, "definition" => "1080 x 2640", "type" => "AMOLED"]);
-        $phone_sam->setDescription("No desc yet.");
-        $phone_sam->setPrice(800.0);
-        $phone_sam->setImageUrl("unknowjpg");
-        $phone_sam->setCount(200);
+        $iPhoneQzPM = new Phone();
+        $iPhoneQzPM->setBrand("Apple");
+        $iPhoneQzPM->setName("iPhone 15 Pro Max");
+        $iPhoneQzPM->setCpu(["frequency" => 2.6, "hearts" => 6, "name" => "A 17 Pro"]);
+        $iPhoneQzPM->setGpu(["frequency" => 1.0]);
+        $iPhoneQzPM->setRam(["capacity" => 8, "type" => "LPDDR4x", "frequency" => 2133]);
+        $iPhoneQzPM->setScreen(["frequency" => 120, "definition" => "2796 x 1290", "type" => "XDR"]);
+        $iPhoneQzPM->setDescription("No desc yet.");
+        $iPhoneQzPM->setPrice(2000.0);
+        $iPhoneQzPM->setImageUrl("unknowjpg");
+        $iPhoneQzPM->setCount(150);
 
-        $phone_asus = new Phone();
-        $phone_asus->setBrand("ASUS ");
-        $phone_asus->setName("ROG Phone 7 ");
-        $phone_asus->setCpu(["frequency" => 3.2, "hearts" => 8, "name" => "Snapdragon 8 gen 2"]);
-        $phone_asus->setGpu(["frequency" => 0.97]);
-        $phone_asus->setRam(["capacity" => 16, "type" => "LPDDR4x", "frequency" => 2133]);
-        $phone_asus->setScreen(["frequency" => 165, "definition" => "1080 x 2448", "type" => "AMOLED"]);
-        $phone_asus->setDescription("No desc yet.");   
-        $phone_asus->setPrice(900.0);
-        $phone_asus->setImageUrl("unknowjpg");
-        $phone_asus->setCount(200);
 
-        $manager->persist($materiel_net);
+        $phoneSamZFQ = new Phone();
+        $phoneSamZFQ->setBrand("Samsug");
+        $phoneSamZFQ->setName("Galaxy Z Flip 4");
+        $phoneSamZFQ->setCpu(["frequency" => 3.0, "hearts" => 8, "name" => "Snapdragon 8+ gen 1"]);
+        $phoneSamZFQ->setGpu(["frequency" => 0.818]);
+        $phoneSamZFQ->setRam(["capacity" => 8, "type" => "LPDDR4x", "frequency" => 2133]);
+        $phoneSamZFQ->setScreen(["frequency" => 120, "definition" => "1080 x 2640", "type" => "AMOLED"]);
+        $phoneSamZFQ->setDescription("No desc yet.");
+        $phoneSamZFQ->setPrice(800.0);
+        $phoneSamZFQ->setImageUrl("unknowjpg");
+        $phoneSamZFQ->setCount(200);
+
+        $phoneSamZFC = new Phone();
+        $phoneSamZFC->setBrand("Samsug");
+        $phoneSamZFC->setName("Galaxy Z Fold 5");
+        $phoneSamZFC->setCpu(["frequency" => 3.36, "hearts" => 8, "name" => "Snapdragon 8 gen 2"]);
+        $phoneSamZFC->setGpu(["frequency" => 0.818]);
+        $phoneSamZFC->setRam(["capacity" => 8, "type" => "LPDDR4x", "frequency" => 2133]);
+        $phoneSamZFC->setScreen(["frequency" => 120, "definition" => "1812 x 2176", "type" => "AMOLED"]);
+        $phoneSamZFC->setDescription("No desc yet.");
+        $phoneSamZFC->setPrice(2039.0);
+        $phoneSamZFC->setImageUrl("unknowjpg");
+        $phoneSamZFC->setCount(200);
+
+
+        $phoneAsus = new Phone();
+        $phoneAsus->setBrand("ASUS ");
+        $phoneAsus->setName("ROG Phone 7 ");
+        $phoneAsus->setCpu(["frequency" => 3.2, "hearts" => 8, "name" => "Snapdragon 8 gen 2"]);
+        $phoneAsus->setGpu(["frequency" => 0.97]);
+        $phoneAsus->setRam(["capacity" => 16, "type" => "LPDDR4x", "frequency" => 2133]);
+        $phoneAsus->setScreen(["frequency" => 165, "definition" => "1080 x 2448", "type" => "AMOLED"]);
+        $phoneAsus->setDescription("No desc yet.");   
+        $phoneAsus->setPrice(900.0);
+        $phoneAsus->setImageUrl("unknowjpg");
+        $phoneAsus->setCount(200);
+
+        $manager->persist($materielNet);
         $manager->persist($ldlc);
 
-        $manager->persist($mat_net_user);
-        $manager->persist($ldlc_user);
-        $manager->persist($mat_net_admin);
-        $manager->persist($ldlc_admin);
+        $manager->persist($matNetUser);
+        $manager->persist($ldlcUser);
+        $manager->persist($matNetAdmin);
+        $manager->persist($ldlcAdmin);
         
-        $manager->persist($phone_apple);
-        $manager->persist($phone_sam);
-        $manager->persist($phone_asus);
+        $manager->persist($iPhoneDz);
+        $manager->persist($iPhoneQz);
+        $manager->persist($phoneSamZFQ);
+        $manager->persist($phoneSamZFC);
+        $manager->persist($phoneAsus);
 
 
         $manager->flush();
