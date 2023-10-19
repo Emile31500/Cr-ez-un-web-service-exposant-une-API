@@ -169,18 +169,18 @@ class ClientController extends AbstractController
      * @return JsonResponse
     */
     #[Groups(['Client'])]
-    #[Route('/api/clients/{id_Client}', name: 'app_Client_details', methods: ['GET'])]
+    #[Route('/api/clients/{idClient}', name: 'app_Client_details', methods: ['GET'])]
     #[Since("1.0")]
-    public function getOne(ClientRepository $ClientRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $id_Client): JsonResponse
+    public function getOne(ClientRepository $ClientRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $idClient): JsonResponse
     {
 
         $project = $this->getUser()->getProject();
         $idCache = "getOneClient";
 
-        $jsonClient = $cache->get($idCache, function (ItemInterface $item) use ($ClientRepository, $id_Client, $serializer, $project){
+        $jsonClient = $cache->get($idCache, function (ItemInterface $item) use ($ClientRepository, $idClient, $serializer, $project){
             
             $item->tag("clientCache");
-            $client = $ClientRepository->findOneById($id_Client, $project);
+            $client = $ClientRepository->findOneById($idClient, $project);
 
             if ($client) {
 
