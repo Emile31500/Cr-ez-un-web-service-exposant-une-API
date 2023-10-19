@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use OpenApi\Annotations as OA;
 use App\Repository\PhoneRepository;
 use JMS\Serializer\Annotation\Since;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -14,9 +15,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PhoneController extends AbstractController
 {
+
     /**
-     * This method list all phones in catalog
-     */
+     * This method serve for get all phones
+     * 
+     * @OA\Response(
+     *     response=200,
+     *     description="Request all the phones",
+     *
+     * )
+     * @OA\Tag(name="Phones")
+     *
+     * @param PhoneRepository $phoneRepository,
+     * @param SerializerInterface $serializer,
+     * @param  TagAwareCacheInterface $cache
+     * @return JsonResponse
+    */
     #[Route('/api/phones', name: 'app_phone_list', methods: ['GET'])]
     #[Since("1.0")]
     public function getAll(PhoneRepository $phoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache): JsonResponse
@@ -35,17 +49,31 @@ class PhoneController extends AbstractController
 
     /**
      * This method list a phone according to his id 
-     */
-    #[Route('/api/phones/{id_phone}', name: 'app_phone_details', methods: ['GET'])]
+     *
+     * 
+     * @OA\Response(
+     *     response=200,
+     *     description="Request one phone according to the provided id",
+     *
+     * )
+     * @OA\Tag(name="Phones")
+     *
+     * @param PhoneRepository $phoneRepository,
+     * @param SerializerInterface $serializer,
+     * @param  TagAwareCacheInterface $cache
+     * @param  int $idPhone
+     * @return JsonResponse
+    */
+    #[Route('/api/phones/{idPhone}', name: 'app_phone_details', methods: ['GET'])]
     #[Since("1.0")]
-    public function getOne(PhoneRepository $phoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $id_phone): JsonResponse
+    public function getOne(PhoneRepository $phoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $idPhone): JsonResponse
     {
     
         $idCache = "getOnePhone";
-        $jsonPhone = $cache->get($idCache, function (ItemInterface $item) use ($serializer, $phoneRepository, $id_phone){
+        $jsonPhone = $cache->get($idCache, function (ItemInterface $item) use ($serializer, $phoneRepository, $idPhone){
             
             $item->tag("phoneCache");
-            $phone = $phoneRepository->findOneById($id_phone);
+            $phone = $phoneRepository->findOneById($idPhone);
             
             if ($phone) {
 
