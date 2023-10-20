@@ -60,31 +60,20 @@ class PhoneController extends AbstractController
      *
      * @param PhoneRepository $phoneRepository,
      * @param SerializerInterface $serializer,
-     * @param  TagAwareCacheInterface $cache
-     * @param  int $idPhone
+     * @param TagAwareCacheInterface $cache
      * @return JsonResponse
     */
-    #[Route('/api/phones/{idPhone}', name: 'app_phone_details', methods: ['GET'])]
+    #[Route('/api/phones/{id_phone}', name: 'app_phone_details', methods: ['GET'])]
     #[Since("1.0")]
-    public function getOne(PhoneRepository $phoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $idPhone): JsonResponse
+    public function getOne(PhoneRepository $phoneRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $id_phone): JsonResponse
     {
-    
-        $idCache = "getOnePhone";
-        $jsonPhone = $cache->get($idCache, function (ItemInterface $item) use ($serializer, $phoneRepository, $idPhone){
-            
-            $item->tag("phoneCache");
-            $phone = $phoneRepository->findOneById($idPhone);
-            
-            if ($phone) {
 
-                $jsonPhone = $serializer->serialize($phone, 'json');
-                return new JsonResponse($jsonPhone, Response::HTTP_OK, [], true);
-    
-            } else {
-    
-                return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-    
-            }
+        $idCache = "getOnePhone".$id_phone;
+        $jsonPhone = $cache->get($idCache, function (ItemInterface $item) use ($serializer, $phoneRepository, $id_phone){
+
+            $item->tag("phoneCache");
+            $phone = $phoneRepository->findOneById($id_phone);
+            return $serializer->serialize($phone, 'json');
 
         }); 
 

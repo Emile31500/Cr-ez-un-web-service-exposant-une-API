@@ -44,22 +44,23 @@ class ClientController extends AbstractController
      * )
      * @OA\Tag(name="Clients")
      *
-     * @param ClientRepository $ClientRepository
-     * @param SerializerInterface $serializer
-     * @param Request $request
+     * @param EntityManager $em
+     * @param TagAwareCacheInterface $cache
      * @return JsonResponse
     */
     #[IsGranted("ROLE_ADMIN")]
     #[Route('/api/clients/{id}', name: 'app_Client_delete', methods: ['DELETE'])]
     #[Since("1.0")]
-    public function delete(Client $Client, EntityManagerInterface $em): JsonResponse 
+    public function delete(Client $Client, EntityManagerInterface $em, TagAwareCacheInterface $cache, int $id): JsonResponse 
     {
         $User = $this->getUser();
 
-        if ($Client->getProject()->getId() === $User->getId()){
+        if ($Client->getProject()->getId() === $User->getProject()->getId()){
 
             $em->remove($Client);
             $em->flush();
+            $cache->deleteItem("getAllClient");
+            $cache->deleteItem("getOneClient".$id);
 
         } else {
 
@@ -113,7 +114,7 @@ class ClientController extends AbstractController
         $cache->deleteItem("getAllClient");
 
         $jsonClient = $serializer->serialize($client, 'json', ['groups' => 'Client']);
-        $location = $urlGenerator->generate('app_Client_details', ['id_Client' => $client->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate('app_Client_details', ['id_client' => $client->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new JsonResponse($jsonClient, Response::HTTP_CREATED, ["Location" => $location], true);
     }
@@ -130,7 +131,7 @@ class ClientController extends AbstractController
      *
      * @param ClientRepository $ClientRepository
      * @param SerializerInterface $serializer
-     * @param Request $request
+     * @param TagAwareCacheInterface $cache
      * @return JsonResponse
     */
     #[Groups(['Client'])]
@@ -165,22 +166,22 @@ class ClientController extends AbstractController
      *
      * @param ClientRepository $ClientRepository
      * @param SerializerInterface $serializer
-     * @param Request $request
+     * @param TagAwareCacheInterface $cache
      * @return JsonResponse
     */
     #[Groups(['Client'])]
-    #[Route('/api/clients/{idClient}', name: 'app_Client_details', methods: ['GET'])]
+    #[Route('/api/clients/{id_client}', name: 'app_Client_details', methods: ['GET'])]
     #[Since("1.0")]
-    public function getOne(ClientRepository $ClientRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $idClient): JsonResponse
+    public function getOne(ClientRepository $ClientRepository, SerializerInterface $serializer, TagAwareCacheInterface $cache, int $id_client): JsonResponse
     {
 
         $project = $this->getUser()->getProject();
-        $idCache = "getOneClient";
+        $idCache = "getOneClient".$id_client;
 
-        $jsonClient = $cache->get($idCache, function (ItemInterface $item) use ($ClientRepository, $idClient, $serializer, $project){
+        $jsonClient = $cache->get($idCache, function (ItemInterface $item) use ($ClientRepository, $id_client, $serializer, $project){
             
             $item->tag("clientCache");
-            $client = $ClientRepository->findOneById($idClient, $project);
+            $client = $ClientRepository->findOneById($id_client, $project);
 
             if ($client) {
 
